@@ -404,7 +404,7 @@ public class MainPanel extends JPanel implements MouseListener{
     }
 
     //
-    private Counter countStone(){
+    public Counter countStone(){
         Counter counter = new Counter();
 
         for(int y = 0; y < MASU; y++){

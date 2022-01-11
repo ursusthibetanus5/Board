@@ -43,7 +43,7 @@ public class AI {
         //
         //
         if(level == 0){
-            return 0;   //
+            return valueBoard();   //
         }
 
         if(flag){
@@ -76,6 +76,13 @@ public class AI {
                             bestX = x;
                             bestY = y;
                         }
+                    }else{
+                        //
+                        if(childValue < value){
+                            value = childValue;
+                            bestX = x;
+                            bestY = y;
+                        }
                     }
                     //
                     panel.undoBoard(undo);
@@ -91,34 +98,15 @@ public class AI {
             //
             return value;
         }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     }
+
+        //
+        private int valueBoard() {
+            MainPanel.Counter counter = panel.countStone();
+            // 白石の数が評価値になる
+            // 白石が多い盤面の方が評価が高いとする
+            return counter.whiteCount;
+        }    
 
 
 
