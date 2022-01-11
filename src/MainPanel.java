@@ -3,13 +3,15 @@ import java.awt.event.*;
 import java.applet.*;
 import javax.swing.*;
 
+//参考URL https://aidiary.hatenablog.com/entry/20040918/1251373370
+
 
 
 public class MainPanel extends JPanel implements MouseListener{
     //マスのサイズ
-    private static final int GS = 32;
+    private static final int GS = 64;
     //マスの数 
-    private static final int MASU = 8;
+    public static final int MASU = 8;
     //盤面の大きさ＝メインパネルの大きさ  
     private static final int WIDTH = GS * MASU;
     private static final int HEIGHT = WIDTH;
@@ -40,6 +42,8 @@ public class MainPanel extends JPanel implements MouseListener{
     private AudioClip kachi;
     //ゲームの状態
     private int gameState;
+    //AI
+    private AI ai;                  
     
     //情報パネルへの参照
     private InfoPanel infoPanel;
@@ -53,6 +57,8 @@ public class MainPanel extends JPanel implements MouseListener{
         initBoard();
         //サウンドをロードする
         kachi = Applet.newAudioClip(getClass().getResource("kachi.wav"));
+        //
+        ai = new AI(this);
         //マウス操作を受け付ける
         addMouseListener(this);
         //START状態（タイトル表示）
@@ -61,6 +67,7 @@ public class MainPanel extends JPanel implements MouseListener{
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+       
         //盤面を描く   
         drawBoard(g);
         switch(gameState){
@@ -68,11 +75,11 @@ public class MainPanel extends JPanel implements MouseListener{
                 drawTextCentering(g,"OTHELLO");
                 break;
             case PLAY:
-                //
+                //石を描く
                 drawStone(g);
-                //
+                //盤面の石の数を数える
                 Counter counter = countStone();
-                //
+                //ラベルに表示
                 infoPanel.setBlackLabel(counter.blackCount);
                 infoPanel.setWhiteLabel(counter.whiteCount);
                 break;
@@ -92,57 +99,62 @@ public class MainPanel extends JPanel implements MouseListener{
     public void mouseClicked(MouseEvent e){
         switch(gameState){
                 case START:
-                    //
+                    //START画面でクリックされたらゲーム開始
                     gameState = PLAY;
                     break;
                 case PLAY:
-                    //
+                    //どこのマスか調べる
                     int x = e.getX() / GS;
                     int y = e.getY() / GS;
-                    //
+                    //(x,y)に石が打てる場合だけ打つ
                     if(canPutDown(x, y)){
-                        //
-                        putDownStone(x, y);
-                        //
-                        reverse(x, y);
-                        //
-                        flagForWhite =! flagForWhite;
+                        //戻せるように記録しておく
+                        Undo undo =new Undo(x, y);
+                        //その場所に石を打つ
+                        putDownStone(x, y, false);
+                        //ひっくり返す
+                        reverse(undo, false);
+                        //手番を変える
+                        nextTurn();
+                        //終了したか調べる
+                        endGame();
+                        //AIが石を打つ
+                        ai.compute();
                     }
-                    //
-                    endGame();
                     break;
                 case YOU_WIN:
                 case YOU_LOSE:
                 case DRAW:
-                    //
+                    //ゲーム終了時にクリックされたらSTARTへと戻る
                     gameState = START;
-                    //
+                    //盤面初期化
                     initBoard();
                     break;
         }
-        //
+        
+        //再描画する
         repaint();
     }
 
-    //
+    //盤面を初期化する
     public void initBoard(){
         for(int y = 0; y < MASU; y++){
             for(int x = 0; x < MASU; x++){
                 board[y][x] = BLANK;
             }
         }
-        //
+        //初期配置
         board[3][3] = board[4][4] = WHITE_STONE;
         board[3][4] = board[4][3] = BLACK_STONE;
-        //
+        //黒番から始める
         flagForWhite = false;
         putNumber = 0;
     }
 
 
-    //
+    //盤面を描く
     private void drawBoard(Graphics g){
-        //
+        //マスを塗りつぶす
         g.setColor(new Color(0,128,128));
         g.fillRect(0,0,WIDTH,HEIGHT);
             for(int y = 0; y < MASU; y++){
@@ -155,7 +167,7 @@ public class MainPanel extends JPanel implements MouseListener{
 
     }
 
-    //
+    //石を描く
     private void drawStone(Graphics g){
         for(int y = 0; y < MASU; y++){
             for(int x = 0; x < MASU; x++){
@@ -173,29 +185,32 @@ public class MainPanel extends JPanel implements MouseListener{
 
 
 
-    //
-    private void putDownStone(int x,int y){
+    //盤面に石を打つ
+    public void putDownStone(int x,int y, boolean tryAndError){
         int stone;
 
-        //
+        //どっちの手番か調べて石の色を決める
         if(flagForWhite){
             stone = WHITE_STONE;
         }else{
             stone = BLACK_STONE;
         }
-        //
+        //石を打つ
         board[y][x] = stone;
-        putNumber++;
         //
-        kachi.play();
-        //
-        update(getGraphics());
-        //
-        sleep();
+        if(!tryAndError){
+            putNumber++;
+            //
+            kachi.play();
+            //
+            update(getGraphics());
+            //
+            sleep();
+        }   
     }
 
     //
-    private boolean canPutDown(int x,int y) {
+    public boolean canPutDown(int x,int y) {
         //
         if(x >= MASU || y >= MASU)
             return false;
@@ -276,21 +291,23 @@ public class MainPanel extends JPanel implements MouseListener{
     }
 
     //
-    private void reverse(int x, int y){
+    public void reverse(Undo undo, boolean tryAndError){
         //
-        if(canPutDown(x, y, 1, 0))      reverse(x, y, 1, 0);
-        if(canPutDown(x, y, 0, 1))      reverse(x, y, 0, 1);
-        if(canPutDown(x, y, -1, 0))     reverse(x, y, -1, 0);
-        if(canPutDown(x, y, 0, -1))     reverse(x, y, 0, -1);
-        if(canPutDown(x, y, 1, 1))      reverse(x, y, 1, 1);
-        if(canPutDown(x, y, -1, -1))    reverse(x, y, -1, -1);
-        if(canPutDown(x, y, 1, -1))     reverse(x, y, 1, -1);
-        if(canPutDown(x, y, -1, 1))     reverse(x, y, -1, 1);
+        if(canPutDown(undo.x, undo.y, 1, 0))      reverse(undo, 1, 0, tryAndError);
+        if(canPutDown(undo.x, undo.y, 0, 1))      reverse(undo, 0, 1, tryAndError);
+        if(canPutDown(undo.x, undo.y, -1, 0))     reverse(undo, -1, 0, tryAndError);
+        if(canPutDown(undo.x, undo.y, 0, -1))     reverse(undo, 0, -1, tryAndError);
+        if(canPutDown(undo.x, undo.y, 1, 1))      reverse(undo, 1, 1,  tryAndError);
+        if(canPutDown(undo.x, undo.y, -1, -1))    reverse(undo, -1, -1, tryAndError);
+        if(canPutDown(undo.x, undo.y, 1, -1))     reverse(undo, 1, -1, tryAndError);
+        if(canPutDown(undo.x, undo.y, -1, 1))     reverse(undo, -1, 1, tryAndError);
     }
     
     //
-    private void reverse(int x, int y, int vecX, int vecY){
+    private void reverse(Undo undo, int vecX, int vecY, boolean tryAndError){
         int putStone;
+        int x = undo.x;
+        int y = undo.y;
 
         if(flagForWhite){
             putStone = WHITE_STONE;
@@ -307,16 +324,45 @@ public class MainPanel extends JPanel implements MouseListener{
             //
             board[y][x] = putStone;
             //
-            kachi.play();
-            //
-            update(getGraphics());
-            //
-            sleep();
+            undo.pos[undo.count++] = new Point(x, y);
+            if(!tryAndError){
+                //
+                kachi.play();
+                //
+                update(getGraphics());
+                //
+                sleep();
+            }
             x += vecX;
             y += vecY;
         }
     }
+
+
+    //
+    public void undoBoard(Undo undo){
+        int c = 0;
+
+        while(undo.pos[c] != null){
+            //
+            int x = undo.pos[c].x;
+            int y = undo.pos[c].y;
+            //
+            //
+            board[y][x] *= -1;
+            c++;
+        }
+        //
+        board[undo.y][undo.x] = BLANK;
+        //
+        nextTurn();
+    }
     
+    //
+    public void nextTurn(){
+        //
+        flagForWhite = !flagForWhite;
+    }
 
     //
     private void sleep(){
