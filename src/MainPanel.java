@@ -114,12 +114,19 @@ public class MainPanel extends JPanel implements MouseListener{
                         putDownStone(x, y, false);
                         //ひっくり返す
                         reverse(undo, false);
-                        //手番を変える
-                        nextTurn();
-                        //終了したか調べる
+                        //
                         endGame();
-                        //AIが石を打つ
-                        ai.compute();
+                        //
+                        nextTurn();
+                        //
+                        if(countCanPutDownStone() == 0){
+                            System.out.println("AI PASS!");
+                            nextTurn();
+                            return;
+                        }else{
+                            //
+                            ai.compute();
+                        }
                     }
                     break;
                 case YOU_WIN:
@@ -365,6 +372,20 @@ public class MainPanel extends JPanel implements MouseListener{
     }
 
     //
+    public int countCanPutDownStone(){
+        int count = 0;
+
+        for(int y = 0; y < MainPanel.MASU; y++){
+            for(int x = 0; x < MainPanel.MASU; x++){
+                if(canPutDown(x, y)){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    //
     private void sleep(){
         try{
             Thread.sleep(SLEEP_TIME);
@@ -384,7 +405,7 @@ public class MainPanel extends JPanel implements MouseListener{
     }
 
     //
-    private void endGame(){
+    public boolean endGame(){
         //
         if(putNumber == END_NUMBER){
             //
@@ -400,7 +421,10 @@ public class MainPanel extends JPanel implements MouseListener{
             }else{
                 gameState = DRAW;
             }
+            repaint();
+            return true;
         }
+        return false;
     }
 
     //
@@ -416,6 +440,12 @@ public class MainPanel extends JPanel implements MouseListener{
             }
         }
         return counter;
+    }
+
+
+    //
+    public int getBoard(int x, int y){
+        return board[y][x];
     }
 
     

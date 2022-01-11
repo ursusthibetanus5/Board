@@ -4,7 +4,7 @@ import javax.swing.*;
 public class Othello extends JFrame{
     public Othello(){
         //
-        setTitle("");
+        setTitle("othllo");
         //
         setResizable(false);
         
