@@ -104,7 +104,7 @@ public class MainPanel extends JPanel implements MouseListener{
                     break;
                 case PLAY:
                     //どこのマスか調べる
-                    int x = e.getX() / GS;
+                    int x = e.getX() / GS; //座標　/ マス
                     int y = e.getY() / GS;
                     //(x,y)に石が打てる場合だけ打つ
                     if(canPutDown(x, y)){
@@ -449,42 +449,6 @@ public class MainPanel extends JPanel implements MouseListener{
     }
 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public void mousePressed(MouseEvent e){
     }
 
@@ -506,19 +470,4 @@ public class MainPanel extends JPanel implements MouseListener{
             whiteCount = 0;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
