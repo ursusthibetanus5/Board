@@ -17,12 +17,12 @@ public class InfoPanel extends JPanel {
 
 
 
-    //
+    //BLACKラベルに値をセットする
     public void setBlackLabel(int count){
         blackLabel.setText(count + "");
     }
 
-    //
+    //WHITEラベルに値をセットする
     public void setWhiteLabel(int count){
         whiteLabel.setText(count + "");
     }

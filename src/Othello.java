@@ -1,23 +1,26 @@
 import java.awt.*;
 import javax.swing.*;
 
+
+
+//OthelloクラスにJFrameクラスを継承
 public class Othello extends JFrame{
     public Othello(){
-        //
+        //タイトル
         setTitle("othllo");
-        //
+        //サイズ変更
         setResizable(false);
         
         Container contentPane = getContentPane();
 
-        //
+        //情報パネル作成
         InfoPanel infoPanel = new InfoPanel();
         contentPane.add(infoPanel, BorderLayout.NORTH);
 
-        //
+        //メインパネル作成してフレームに追加
         MainPanel mainPanel = new MainPanel(infoPanel);
         contentPane.add(mainPanel, BorderLayout.CENTER);
-
+        //パネルサイズに合わせてフレームサイズを自動設定
         pack();
     }
 
