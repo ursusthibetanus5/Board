@@ -12,6 +12,7 @@ public class Undo {
 
 
     public Undo(int x, int y){
+        //インスタンス変数とローカル変数の入力値が一致しているので左辺のインスタンス変数を明示
         this.x = x;
         this.y = y;
         count = 0;

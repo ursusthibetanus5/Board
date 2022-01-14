@@ -3,6 +3,7 @@ import javax.swing.*;
 
 
 public class InfoPanel extends JPanel {
+    //swingにおいてラベル作成するクラス
     private JLabel blackLabel;
     private JLabel whiteLabel;
 

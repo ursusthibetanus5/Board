@@ -10,7 +10,7 @@ public class Othello extends JFrame{
         setTitle("othllo");
         //サイズ変更
         setResizable(false);
-        
+        //Container型変数　contentPaneを宣言
         Container contentPane = getContentPane();
 
         //情報パネル作成

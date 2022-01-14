@@ -1,6 +1,7 @@
 //参考URL https://aidiary.hatenablog.com/entry/20040918/1251373370
 
 //awtを引き込む
+// Abustract Window Toolkit
 import java.awt.*;
 import java.awt.event.*;
 //今は非推奨
@@ -54,16 +55,19 @@ public class MainPanel extends JPanel implements MouseListener{
     private AudioClip kachi;
     //ゲームの状態
     private int gameState;
-    //AI
-    //
+    //AIを参照
+    //AI型の変数aiを宣言
     private AI ai;                  
     
     //情報パネルへの参照
+    // InfoPanel型変数infoPanel宣言
     private InfoPanel infoPanel;
 
     public MainPanel(InfoPanel infoPanel){
+        //テキストフィールドのサイズをピクセル単位で設定
         //othelloでpack()するときに必要
         setPreferredSize(new Dimension(WIDTH,HEIGHT));
+        // このクラスのinfoPanelにinfoPanel代入
         this.infoPanel = infoPanel;
 
         //盤面を初期化する
@@ -258,27 +262,29 @@ public class MainPanel extends JPanel implements MouseListener{
           return false;
         //8方向のうち一か所でもひっくり返せればこの場所に打てる
         //ひっくり返せるかどうかはもう1つのcanPutDownで調べる
+
+        // 右
         if(canPutDown(x, y, 1, 0))
             return true;
-        //
+        //上
         if(canPutDown(x, y, 0, 1))
             return true;
-        //
+        //左
         if(canPutDown(x, y, -1, 0))
             return true;
-        //
+        //下
         if(canPutDown(x, y, 0, -1))
             return true;
-        //
+        //右斜め上
         if(canPutDown(x, y, 1, 1)) 
             return true;
-        //   
+        //左斜め下
         if(canPutDown(x, y, -1, -1))
             return true;
-        //
+        //右斜め下
         if(canPutDown(x, y, 1, -1))
             return true;
-        //
+        //左斜め上
         if(canPutDown(x, y, -1, 1))
             return true;
 
@@ -332,9 +338,9 @@ public class MainPanel extends JPanel implements MouseListener{
         return false;
     }
 
-    //石をひっくり返す
+    //石をひっくり返す場所
     public void reverse(Undo undo, boolean tryAndError){
-        //
+        //8方向
         if(canPutDown(undo.x, undo.y, 1, 0))      reverse(undo, 1, 0, tryAndError);
         if(canPutDown(undo.x, undo.y, 0, 1))      reverse(undo, 0, 1, tryAndError);
         if(canPutDown(undo.x, undo.y, -1, 0))     reverse(undo, -1, 0, tryAndError);
@@ -351,6 +357,7 @@ public class MainPanel extends JPanel implements MouseListener{
         int x = undo.x;
         int y = undo.y;
 
+        //今どっちの番？
         if(flagForWhite){
             putStone = WHITE_STONE;
         }else{
@@ -469,7 +476,9 @@ public class MainPanel extends JPanel implements MouseListener{
             }else{
                 gameState = DRAW;
             }
+            //再描画
             repaint();
+            //呼び出し元にtrueを返す
             return true;
         }
         return false;
@@ -481,6 +490,7 @@ public class MainPanel extends JPanel implements MouseListener{
 
         for(int y = 0; y < MASU; y++){
             for(int x  = 0; x < MASU; x++){
+                //もしボードの座標(x,y)が黒石なら黒のカウント1つ足す 
                 if(board[y][x] == BLACK_STONE)
                     counter.blackCount++;
                 if(board[y][x] == WHITE_STONE)
@@ -496,16 +506,16 @@ public class MainPanel extends JPanel implements MouseListener{
         return board[y][x];
     }
 
-    
+    //マウスを押す
     public void mousePressed(MouseEvent e){
     }
-
+    //マウスが入る
     public void mouseEntered(MouseEvent e){
     }
-
+    //マウスが出る
     public void mouseExited(MouseEvent e){
     }
-
+    //マウスを離す
     public void mouseReleased(MouseEvent e){
     }
 }
