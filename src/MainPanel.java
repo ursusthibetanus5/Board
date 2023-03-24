@@ -1,5 +1,3 @@
-//参考URL https://aidiary.hatenablog.com/entry/20040918/1251373370
-
 //awtを引き込む
 // Abustract Window Toolkit
 import java.awt.*;
